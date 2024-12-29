@@ -1,6 +1,8 @@
 import React from "react";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
+import { login } from "../../api/auth"; // Import the API function
+import { useAuth } from "../../hooks/useAuth"; // Import the auth hook
 import {
   TextField,
   Button,
@@ -8,97 +10,42 @@ import {
   Container,
   Paper,
   InputAdornment,
-  Alert,
 } from "@mui/material";
-import { LockOutlined, EmailOutlined } from "@mui/icons-material";
-import axios from "axios";
-import { useNavigate } from "react-router-dom"; // React Router for navigation
-
-// Yup validation schema for the form
-const validationSchema = Yup.object({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
+import { EmailOutlined, LockOutlined } from "@mui/icons-material";
 
 const AdminLoginForm: React.FC = () => {
-  const navigate = useNavigate(); // React Router navigate hook for redirection
-  const [errorMessage, setErrorMessage] = React.useState<string>("");
+  const { login: handleLogin } = useAuth();
 
-  // Initial values for Formik
-  const initialValues = {
-    email: "",
-    password: "",
-  };
+  // Yup validation schema
+  const validationSchema = Yup.object({
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
 
-  // Handle form submission
   const handleSubmit = async (values: { email: string; password: string }) => {
     try {
-      // Make API call to Node.js backend for login
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
-        {
-          email: values.email,
-          password: values.password,
-        }
-      );
-
-      if (response.status === 200) {
-        // Store token in localStorage or sessionStorage
-        localStorage.setItem("authToken", response.data.token);
-
-        // Navigate to the dashboard on successful login
-        alert("Login successful!");
-        navigate("/dashboard"); // Navigate to the dashboard page
-      }
-    } catch (error: any) {
-      // Handle errors (e.g., invalid credentials, server errors)
-      setErrorMessage("Invalid login credentials. Please try again.");
+      const response = await login(values.email, values.password); // Simulated API call
+      handleLogin(response.token); // Save token via useAuth
+      window.location.replace("/dashboard"); // Navigate to dashboard
+    } catch (error) {
+      alert("Login failed. Please check your credentials.");
     }
   };
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 2,
-        marginTop: "20px",
-      }}
-    >
-      <Paper
-        sx={{
-          padding: 3,
-          width: "100%",
-          maxWidth: 400,
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
-          boxShadow: 3,
-          borderRadius: 2,
-        }}
-      >
-        <Typography variant="h4" component="h1" align="center" sx={{ mb: 3 }}>
+    <Container maxWidth="sm" sx={{ mt: 5 }}>
+      <Paper sx={{ p: 4, boxShadow: 3 }}>
+        <Typography variant="h4" align="center" sx={{ mb: 3 }}>
           Admin Login
         </Typography>
-
-        {/* Display error message if login fails */}
-        {errorMessage && (
-          <Alert severity="error" sx={{ marginBottom: 2 }}>
-            {errorMessage}
-          </Alert>
-        )}
-
         <Formik
-          initialValues={initialValues}
+          initialValues={{ email: "", password: "" }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ touched, errors, handleChange, values }) => (
+          {({ errors, touched }) => (
             <Form>
               {/* Email Field */}
               <Field
@@ -107,12 +54,9 @@ const AdminLoginForm: React.FC = () => {
                 label="Email Address"
                 variant="outlined"
                 fullWidth
-                autoFocus
                 margin="normal"
-                value={values.email}
-                onChange={handleChange}
-                error={touched.email && Boolean(errors.email)}
                 helperText={touched.email && errors.email}
+                error={touched.email && Boolean(errors.email)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -131,10 +75,8 @@ const AdminLoginForm: React.FC = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={values.password}
-                onChange={handleChange}
-                error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
+                error={touched.password && Boolean(errors.password)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -151,14 +93,10 @@ const AdminLoginForm: React.FC = () => {
                 color="primary"
                 fullWidth
                 sx={{
-                  padding: "10px 0",
-                  marginTop: 3,
-                  fontSize: "1.1rem",
-                  boxShadow: 3,
-                  "&:hover": {
-                    backgroundColor: "#1976d2",
-                    boxShadow: 6,
-                  },
+                  mt: 3,
+                  py: 1.5,
+                  fontWeight: "bold",
+                  fontSize: "1rem",
                 }}
               >
                 Login
