@@ -30,7 +30,7 @@ const AdminLoginForm: React.FC = () => {
       handleLogin(response.token); // Save token via useAuth
       window.location.replace("/dashboard"); // Navigate to dashboard
     } catch (error) {
-      alert("Login failed. Please check your credentials.");
+      alert("Login failed. Please check your credentials." + error);
     }
   };
 
