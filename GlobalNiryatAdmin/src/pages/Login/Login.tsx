@@ -1,8 +1,8 @@
 import React from "react";
-import FormComponent from "../../components/common/FormComponent"; // Import the FormComponent
+import AdminLoginForm from "../../components/common/AdminLoginForm"; // Import the FormComponent
 
 const Login: React.FC = () => {
-  return <FormComponent />;
+  return <AdminLoginForm />;
 };
 
 export default Login;

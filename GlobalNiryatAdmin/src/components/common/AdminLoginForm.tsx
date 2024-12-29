@@ -8,8 +8,11 @@ import {
   Container,
   Paper,
   InputAdornment,
+  Alert,
 } from "@mui/material";
 import { LockOutlined, EmailOutlined } from "@mui/icons-material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom"; // React Router for navigation
 
 // Yup validation schema for the form
 const validationSchema = Yup.object({
@@ -21,7 +24,10 @@ const validationSchema = Yup.object({
     .required("Password is required"),
 });
 
-const FormComponent: React.FC = () => {
+const AdminLoginForm: React.FC = () => {
+  const navigate = useNavigate(); // React Router navigate hook for redirection
+  const [errorMessage, setErrorMessage] = React.useState<string>("");
+
   // Initial values for Formik
   const initialValues = {
     email: "",
@@ -29,19 +35,37 @@ const FormComponent: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (values: { email: string; password: string }) => {
-    console.log("Form data", values);
-    alert(`Logging in with email: ${values.email}`);
+  const handleSubmit = async (values: { email: string; password: string }) => {
+    try {
+      // Make API call to Node.js backend for login
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/login",
+        {
+          email: values.email,
+          password: values.password,
+        }
+      );
+
+      if (response.status === 200) {
+        // Store token in localStorage or sessionStorage
+        localStorage.setItem("authToken", response.data.token);
+
+        // Navigate to the dashboard on successful login
+        alert("Login successful!");
+        navigate("/dashboard"); // Navigate to the dashboard page
+      }
+    } catch (error: any) {
+      // Handle errors (e.g., invalid credentials, server errors)
+      setErrorMessage("Invalid login credentials. Please try again.");
+    }
   };
 
   return (
     <Container
-      //   maxWidth="xs"
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        // height: "100vh", // Center the form vertically
         padding: 2,
         marginTop: "20px",
       }}
@@ -61,6 +85,13 @@ const FormComponent: React.FC = () => {
         <Typography variant="h4" component="h1" align="center" sx={{ mb: 3 }}>
           Admin Login
         </Typography>
+
+        {/* Display error message if login fails */}
+        {errorMessage && (
+          <Alert severity="error" sx={{ marginBottom: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
 
         <Formik
           initialValues={initialValues}
@@ -140,4 +171,4 @@ const FormComponent: React.FC = () => {
   );
 };
 
-export default FormComponent;
+export default AdminLoginForm;
