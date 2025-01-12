@@ -1,13 +1,12 @@
-import React from "react";
-// import "./Dashboard.module.css";
+import React from 'react'
+import ProductTable from '../producttable/ProductTable'
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   return (
-    <div className="dashboard-container">
-      <h1>Dashboard</h1>
-      <p>Welcome to the Dashboard!</p>
+    <div>
+      <ProductTable />
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
