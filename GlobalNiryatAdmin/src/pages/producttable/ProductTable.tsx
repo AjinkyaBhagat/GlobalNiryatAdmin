@@ -109,14 +109,14 @@ const ProductTable: React.FC = () => {
       ) : (
         <TableContainer component={Paper} sx={{ bgcolor: "", overflowX: "auto" }}>
           <Table sx={{ minWidth: 650 }} aria-label="product table">
-            <TableHead>
+            <TableHead sx={{ bgcolor: "#2459a5", overflowX: "auto" }}>
               <TableRow>
-                <TableCell sx={{ color: "#1E1E1E" }}>Actions</TableCell>
-                <TableCell sx={{ color: "#1E1E1E" }}>Name</TableCell>
-                <TableCell sx={{ color: "#1E1E1E" }}>Description</TableCell>
-                <TableCell sx={{ color: "#1E1E1E" }}>Image</TableCell>
-                <TableCell sx={{ color: "#1E1E1E" }}>Created By</TableCell>
-                <TableCell sx={{ color: "#1E1E1E" }}>Created At</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>ACTIONS</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>NAME</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>DESCRIPTION</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>IMAGE</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>CREATED BY</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>CREATED AT</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
