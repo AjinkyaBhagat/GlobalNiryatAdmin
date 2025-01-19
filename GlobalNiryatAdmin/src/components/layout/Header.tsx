@@ -1,4 +1,5 @@
 import React from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 

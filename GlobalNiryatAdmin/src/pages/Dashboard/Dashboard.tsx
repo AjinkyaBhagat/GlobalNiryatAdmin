@@ -1,5 +1,5 @@
 import React from 'react'
-import ProductTable from '../producttable/ProductTable'
+import ProductTable from '../../components/producttable/ProductTable';
 
 const Dashboard = () => {
   return (
