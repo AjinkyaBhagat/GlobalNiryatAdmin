@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from "@mui/material";
+import { Box, Button, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Snackbar, Alert } from "@mui/material";
 import { getProducts, createProduct, deleteProduct, updateProduct } from "../../services/api";
 import ProductModal from "../Productmodal/ProductModal";
 import ProductTableRow from "../producttablerow/ProductTableRow";
@@ -12,6 +12,7 @@ const ProductTable: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [newProduct, setNewProduct] = useState({ name: "", description: "", image: "", createdBy: "" });
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);  // For editing product
+  const [error, setError] = useState<string | null>(null); // For handling image size error
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -22,17 +23,43 @@ const ProductTable: React.FC = () => {
     fetchProducts();
   }, []);
 
+  // Handle image selection and conversion to base64 with size validation
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      // Check the file size (5MB = 5 * 1024 * 1024 bytes)
+      const MAX_SIZE = 5 * 1024 * 1024;
+      if (file.size > MAX_SIZE) {
+        setError("File size exceeds 5MB. Please upload a smaller image.");
+        return; // Exit if file size is too large
+      } else {
+        setError(null); // Clear error if file size is valid
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file); // Convert to Base64
+      reader.onload = () => {
+        if (reader.result) {
+          if (editingProduct) {
+            setEditingProduct((prev) => prev ? { ...prev, image: reader.result as string } : prev);
+          } else {
+            setNewProduct((prev) => ({ ...prev, image: reader.result as string }));
+          }
+        }
+      };
+    }
+  };
+
   // Handle saving new or edited product
   const handleSaveProduct = async () => {
     if (editingProduct) {
-      // Editing an existing product
       await updateProduct(editingProduct._id, editingProduct);
       setProducts((prev) =>
         prev.map((product) => (product._id === editingProduct._id ? editingProduct : product))
       );
-      setEditingProduct(null);  // Reset editingProduct
+      setEditingProduct(null);
     } else {
-      // Creating a new product
       await createProduct(newProduct);
       setProducts((prev) => [
         ...prev,
@@ -40,7 +67,7 @@ const ProductTable: React.FC = () => {
       ]);
     }
     setNewProduct({ name: "", description: "", image: "", createdBy: "" });
-    setOpenModal(false);  // Close the modal
+    setOpenModal(false);
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -49,8 +76,8 @@ const ProductTable: React.FC = () => {
   };
 
   const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);  // Set the product to be edited
-    setOpenModal(true);  // Open the modal for editing
+    setEditingProduct(product);
+    setOpenModal(true);
   };
 
   return (
@@ -79,20 +106,27 @@ const ProductTable: React.FC = () => {
             </TableHead>
             <TableBody>
               {products.map((product) => (
-                <ProductTableRow
-                  key={product._id}
-                  product={product}
-                  onEdit={handleEditProduct}  // Pass the handleEditProduct function
-                  onDelete={handleDeleteProduct}
-                />
+                <ProductTableRow key={product._id} product={product} onEdit={handleEditProduct} onDelete={handleDeleteProduct} />
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       )}
+
+      {/* Snackbar for error handling */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert onClose={() => setError(null)} severity="error" sx={{ width: "100%" }}>
+          {error}
+        </Alert>
+      </Snackbar>
+
       <ProductModal
         open={openModal}
-        product={editingProduct || newProduct}  // Pass editingProduct if it's being edited
+        product={editingProduct || newProduct}
         onClose={() => setOpenModal(false)}
         onSave={handleSaveProduct}
         onChange={(e) => {
@@ -103,6 +137,7 @@ const ProductTable: React.FC = () => {
             setNewProduct((prev) => ({ ...prev, [name]: value }));
           }
         }}
+        onImageChange={handleImageChange}
       />
     </Box>
   );

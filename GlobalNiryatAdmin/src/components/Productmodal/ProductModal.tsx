@@ -9,16 +9,18 @@ type ProductModalProps = {
   onClose: () => void;
   onSave: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const ProductModal: React.FC<ProductModalProps> = ({ open, product, onClose, onSave, onChange }) => {
+const ProductModal: React.FC<ProductModalProps> = ({ open, product, onClose, onSave, onChange, onImageChange }) => {
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyles}>
         <Typography variant="h6" component="h2" mb={2}>
-          Create Product
+          {product.name ? "Edit Product" : "Create Product"}
         </Typography>
-        {["name", "description", "image", "createdBy"].map((field) => (
+
+        {["name", "description", "createdBy"].map((field) => (
           <TextField
             key={field}
             label={field.charAt(0).toUpperCase() + field.slice(1)}
@@ -31,6 +33,17 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, product, onClose, onS
             InputProps={{ style: { color: "#fff" } }}
           />
         ))}
+
+        {/* Image Upload */}
+        <input type="file" accept="image/*" onChange={onImageChange} />
+        
+        {/* Show image preview if available */}
+        {product.image && (
+          <Box mt={2} textAlign="center">
+            <img src={product.image} alt="Preview" style={{ maxWidth: "100%", height: "100px" }} />
+          </Box>
+        )}
+
         <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
           <Button onClick={onClose} color="secondary">
             Cancel
