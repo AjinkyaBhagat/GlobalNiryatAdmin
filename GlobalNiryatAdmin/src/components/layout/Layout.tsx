@@ -1,6 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import Header from "./Header";
+import Footer from "./Footer";
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -21,6 +22,7 @@ const Layout: React.FC = () => {
       <Box sx={{ flexGrow: 1, padding: 2, mt: 6 }}>
         <Outlet />
       </Box>
+      <Footer />
     </Box>
   );
 };
